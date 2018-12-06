@@ -35,7 +35,6 @@ public class AccountBillingService {
                         }
 
                         bill.addAllocation(allocation);
-
                         saveBill(bill);
                     }
                     if (canceledAllocationAmount == 0) {

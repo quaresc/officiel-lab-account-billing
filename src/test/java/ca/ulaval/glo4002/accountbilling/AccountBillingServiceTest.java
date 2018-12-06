@@ -12,7 +12,7 @@ public class AccountBillingServiceTest {
     // TODO : caracterisation tests.
 
     @Test(expected = BillNotFoundException.class)
-    public void givenNoBill_thenThrows() {
+    public void givenBillNotFound_thenThrows() {
         TestableAccountBillingService service = new TestableAccountBillingService();
         billToCancel = null;
         service.cancelInvoiceAndRedistributeFunds(new BillId(0));
