@@ -5,41 +5,40 @@ import java.util.List;
 public class AccountBillingService {
 
     public void cancelInvoiceAndRedistributeFunds(BillId id) {
-        Bill billToCancel = findBill(id);
-        if (billToCancel == null) {
+        Bill canceledBill = findBill(id);
+        if (canceledBill == null) {
             throw new BillNotFoundException();
         } else {
-            ClientId billClientId = billToCancel.getClientId();
+            ClientId billClientId = canceledBill.getClientId();
 
-            if (!billToCancel.isCancelled()) {
-                billToCancel.cancel();
+            if (!canceledBill.isCancelled()) {
+                canceledBill.cancel();
             }
 
-            saveBill(billToCancel);
+            saveBill(canceledBill);
 
-            List<Allocation> canceledAllocations = billToCancel.getAllocations();
+            List<Allocation> canceledAllocations = canceledBill.getAllocations();
             for (Allocation canceledAllocation : canceledAllocations) {
-                List<Bill> bills = findBillsToRedistribute(billClientId);
-                int amount = canceledAllocation.getAmount();
+                List<Bill> billsToRedistribute = findBillsToRedistribute(billClientId);
+                int canceledAllocationAmount = canceledAllocation.getAmount();
 
-                for (Bill possibleBill : bills) {
-                    if (billToCancel != possibleBill) {
-                        int remainingAmount = possibleBill.getRemainingAmount();
+                for (Bill bill : billsToRedistribute) {
+                    if (canceledBill != bill) {
+                        int remainingAmount = bill.getRemainingAmount();
                         Allocation allocation;
-                        if (remainingAmount <= amount) {
+                        if (remainingAmount <= canceledAllocationAmount) {
                             allocation = new Allocation(remainingAmount);
-                            amount -= remainingAmount;
+                            canceledAllocationAmount -= remainingAmount;
                         } else {
-                            allocation = new Allocation(amount);
-                            amount = 0;
+                            allocation = new Allocation(canceledAllocationAmount);
+                            canceledAllocationAmount = 0;
                         }
 
-                        possibleBill.addAllocation(allocation);
+                        bill.addAllocation(allocation);
 
-                        saveBill(possibleBill);
+                        saveBill(bill);
                     }
-
-                    if (amount == 0) {
+                    if (canceledAllocationAmount == 0) {
                         break;
                     }
                 }
