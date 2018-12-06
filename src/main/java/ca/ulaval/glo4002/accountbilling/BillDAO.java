@@ -20,6 +20,11 @@ public class BillDAO {
         return instance;
     }
 
+/*  Could do that
+    public static void forceInstanceForTests(BillDAO dao) {
+        instance = dao;
+    }*/
+
     private BillDAO() {
     }
 
